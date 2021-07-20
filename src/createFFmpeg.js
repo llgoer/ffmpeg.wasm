@@ -146,7 +146,8 @@ module.exports = (_options = {}) => {
     }
   };
 
-  const runffprobe = (..._args) => {
+  // let result = await ffmpeg.runffprobe("-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", this.audio_filename);
+  const runffprobe = async (..._args) => {
     log('info', `run ffprobe command: ${_args.join(' ')}`);
     if (Core === null) {
       throw NO_LOAD;
@@ -155,34 +156,12 @@ module.exports = (_options = {}) => {
     } else {
       running = true;
       result = "";
-      return new Promise((resolve) => {
-        const args = ['ffmpeg', 'ffprobe', ..._args].filter((s) => s.length !== 0);
-        runResolve = resolve;
-        ffmpeg(...parseArgs(Core, args));
-      });
+      const args = ['ffmpeg', 'ffprobe', ..._args].filter((s) => s.length !== 0);
+      ffmpeg(...parseArgs(Core, args));
+      await new Promise((_resolve) => { runResolve = _resolve });
+      return result;
     }
   };
-
-  const getResult = ()=>{
-    return result;
-  }
-
-  // 下面代码会导致 pthread_getschedparam attempted on thread 27703416, which does not point to a valid thread, or does not exist anymore!
-  // const runffprobe = async (..._args) => {
-  //   log('info', `run ffprobe command: ${_args.join(' ')}`);
-  //   if (Core === null) {
-  //     throw NO_LOAD;
-  //   } else if (running) {
-  //     throw Error('ffprobe.wasm can only run one command at a time');
-  //   } else {
-  //     running = true;
-  //     result = "";
-  //     const args = ['ffmpeg', 'ffprobe', ..._args].filter((s) => s.length !== 0);
-  //     ffmpeg(...parseArgs(Core, args));
-  //     await new Promise((_resolve) => { runResolve = _resolve });
-  //     return {result};
-  //   }
-  // };
 
   /*
    * Run FS operations.
@@ -255,7 +234,6 @@ module.exports = (_options = {}) => {
     load,
     isLoaded,
     run,
-    getResult,
     runffprobe,
     exit,
     FS,
