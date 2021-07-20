@@ -7,6 +7,10 @@ module.exports = {
     /* Force to override output file */
     '-y',
   ],
+  defaultFFprobeArgs: [
+    './ffmpeg',
+    'ffprobe',
+  ],
   baseOptions: {
     /* Flag to turn on/off log messages in console */
     log: false,
